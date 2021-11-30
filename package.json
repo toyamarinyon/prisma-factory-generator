@@ -1,0 +1,29 @@
+{
+  "name": "prisma-factory-generator",
+  "version": "0.0.1",
+  "description": "Factory generator for Prisma Schema",
+  "main": "dist/index.js",
+  "repository": "https://github.com/toyamarinyon/prisma-factory-generator",
+  "author": "@toyamarinyon",
+  "license": "MIT",
+  "private": "false",
+  "dependencies": {
+    "@prisma/generator-helper": "^3.5.0",
+    "@prisma/sdk": "^3.5.0"
+  },
+  "devDependencies": {
+    "@prisma/client": "^3.5.0",
+    "@swc/core": "^1.2.114",
+    "@swc/jest": "^0.2.11",
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.1",
+    "prettier": "^2.5.0",
+    "prisma": "^3.5.0",
+    "regenerator-runtime": "^0.13.9",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
