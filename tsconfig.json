@@ -6,7 +6,7 @@
     "sourceMap": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["es2019", "dom"], // dom is added for prismjs :(
+    "lib": ["es2019"],
     "strict": true,
     "esModuleInterop": true
   }

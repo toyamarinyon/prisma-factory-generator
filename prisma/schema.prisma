@@ -1,6 +1,11 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,16 +14,24 @@ generator factory {
   provider = "node ./dist/index.js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  createdAt   DateTime     @default(now()) @map(name: "created_at")
+  updatedAt   DateTime     @default(now()) @map(name: "updated_at")
+  accessToken AccessToken?
+  uuid        String       @unique @default(uuid())
+
+  @@map(name: "users")
 }
 
-model Student {
-  id        Int    @id @default(autoincrement())
-  firstName String @map("first_name")
-  lastName  String @map("last_name")
-  email     String
+model AccessToken {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int      @unique @map(name: "user_id")
+  createdAt  DateTime @default(now()) @map(name: "created_at")
+  paidAmount Int      @map(name: "paid_amount")
+  isActive   Boolean  @default(false)
 
-  @@map("students")
+  @@map("access_tokens")
 }

@@ -9,23 +9,27 @@
   "private": "false",
   "dependencies": {
     "@prisma/generator-helper": "^3.5.0",
-    "@prisma/sdk": "^3.5.0"
+    "@prisma/sdk": "^3.5.0",
+    "camelcase": "^6.2.1",
+    "faker": "^5.5.3"
   },
   "devDependencies": {
     "@prisma/client": "^3.5.0",
     "@swc/cli": "^0.1.52",
     "@swc/core": "^1.2.114",
     "@swc/jest": "^0.2.11",
+    "@types/faker": "^5.5.9",
     "@types/jest": "^27.0.3",
     "jest": "^27.4.1",
     "prettier": "^2.5.0",
     "prisma": "^3.5.0",
     "regenerator-runtime": "^0.13.9",
+    "ts-morph": "^13.0.2",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "build": "swc src/index.ts -o dist/index.js",
+    "build": "swc src -d dist",
     "test": "jest"
   }
 }
