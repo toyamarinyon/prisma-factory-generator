@@ -5,6 +5,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator factory {
+  provider = "node ./dist/index.js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

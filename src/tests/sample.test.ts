@@ -1,4 +1,4 @@
-import { getDMMF } from "@prisma/sdk";
+import { getDMMF } from '@prisma/sdk'
 
 const datamodel = /* Prisma */ `
   model Post {
@@ -11,9 +11,9 @@ const datamodel = /* Prisma */ `
     userId String @id @default(cuid())
     something String
   }
-`;
+`
 
-test("getDMMF", async () => {
-  const dmmf = await getDMMF({ datamodel });
-  expect(dmmf).toMatchSnapshot();
-});
+test('getDMMF', async () => {
+  const dmmf = await getDMMF({ datamodel })
+  expect(dmmf).toMatchSnapshot()
+})

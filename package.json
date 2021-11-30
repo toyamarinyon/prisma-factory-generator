@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@prisma/client": "^3.5.0",
+    "@swc/cli": "^0.1.52",
     "@swc/core": "^1.2.114",
     "@swc/jest": "^0.2.11",
     "@types/jest": "^27.0.3",
@@ -24,6 +25,7 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
+    "build": "swc src/index.ts -o dist/index.js",
     "test": "jest"
   }
 }
