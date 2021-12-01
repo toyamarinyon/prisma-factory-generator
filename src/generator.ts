@@ -19,12 +19,25 @@ export function addPrismaImportDeclaration(sourceFile: SourceFile) {
   sourceFile.addStatements(`const prisma = new PrismaClient()`)
 }
 
-export function addModelFactoryDeclaration(
+export function getModelDefaultValueVariableInitializer(model: DMMF.Model) {
+  return Object.fromEntries(
+    model.fields
+      .filter((field) => !field.isId)
+      .filter((field) => field.kind === 'scalar')
+      .filter((field) => {
+        return !model.fields.find((it) => {
+          return it.relationFromFields?.includes(field.name)
+        })
+      })
+      .filter((field) => !field.hasDefaultValue)
+      .map((field) => [field.name, fakerForField(field)])
+  )
+}
+export function addModelDefaultValueVariableStatement(
   sourceFile: SourceFile,
   model: DMMF.Model
 ) {
-  const modelName = model.name
-  const defaultVariableName = `${modelName}DefaultVariables`
+  const defaultVariableName = camelcase([model.name, 'DefaultVariables'])
   sourceFile.addVariableStatement({
     isExported: true,
     declarationKind: VariableDeclarationKind.Const,
@@ -32,16 +45,21 @@ export function addModelFactoryDeclaration(
       {
         name: defaultVariableName,
         initializer: Writers.object(
-          Object.fromEntries(
-            model.fields
-              .filter((field) => field.kind === 'scalar')
-              .map((field) => [field.name, fakerForField(field)])
-          )
+          getModelDefaultValueVariableInitializer(model)
         ),
       },
     ],
     leadingTrivia: '\r\n',
   })
+}
+
+export function addModelFactoryDeclaration(
+  sourceFile: SourceFile,
+  model: DMMF.Model
+) {
+  const modelName = model.name
+  const defaultVariableName = `${modelName}DefaultVariables`
+  addModelDefaultValueVariableStatement(sourceFile, model)
   sourceFile.addFunction({
     isExported: true,
     isAsync: true,
