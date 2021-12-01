@@ -19,7 +19,7 @@ export function fakerForField(field: DMMF.Field) {
     return 'faker.datatype.datetime()'
   }
   if (fieldType === 'Boolean') {
-    return field.default ?? false
+    return field.default as string ?? false
   }
   throw new Error(`${fieldType} isn't support now. kind: ${fieldKind}`)
 }

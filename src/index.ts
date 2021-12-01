@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { generatorHandler } from '@prisma/generator-helper'
 import { Project, ts } from 'ts-morph'
 import * as fs from 'fs'
@@ -9,7 +11,7 @@ import {
 generatorHandler({
   onManifest() {
     return {
-      defaultOutput: './factories',
+      defaultOutput: 'node_modules/.prisma/factory',
       prettyName: 'Prisma Factory Generator',
     }
   },
@@ -19,7 +21,7 @@ generatorHandler({
     if (output) {
       const project = new Project({})
       const sourceFile = project.createSourceFile(
-        `${output}/index.js`,
+        `${output}/index.ts`,
         undefined,
         {
           overwrite: true,

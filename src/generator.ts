@@ -12,6 +12,10 @@ export function addPrismaImportDeclaration(sourceFile: SourceFile) {
     moduleSpecifier: '.prisma/client',
     namedImports: ['Prisma'],
   })
+  sourceFile.addImportDeclaration({
+    moduleSpecifier: 'faker',
+    defaultImport: 'faker',
+  })
   sourceFile.addStatements(`const prisma = new PrismaClient()`)
 }
 
@@ -44,14 +48,14 @@ export function addModelFactoryDeclaration(
     name: camelcase(['create', modelName]),
     parameters: [
       {
-        name: 'args',
-        type: `Prisma.${camelcase([modelName, 'CreateArgs'], {
+        name: 'args?',
+        type: `Partial<Prisma.${camelcase([modelName, 'CreateArgs'], {
           pascalCase: true,
-        })}`,
+        })}>`,
       },
     ],
     statements: `
-      return await prisma.${modelName}.create({
+      return await prisma.${camelcase(modelName)}.create({
         data: {
           ...${defaultVariableName},
           ...args.data,
