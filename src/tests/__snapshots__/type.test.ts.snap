@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`snapshot 1`] = `
+"type createUserArgs = RequiredParametersForUserCreation & Partial<Prisma.UserCreateArgs>
+"
+`;
+
+exports[`snapshot 2`] = `
+"type createAccessTokenArgs = RequiredParametersForAccessTokenCreation & Partial<Prisma.AccessTokenCreateArgs>
+"
+`;

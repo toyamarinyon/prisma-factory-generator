@@ -3,6 +3,24 @@ import camelcase from 'camelcase'
 import { fakerForField } from './helper'
 import { SourceFile, VariableDeclarationKind, Writers } from 'ts-morph'
 
+function getModelFactoryParameterTypeName(model: DMMF.Model) {
+  return camelcase(['create', model.name, 'Args'])
+}
+export function addModelFactoryParameterType(
+  sourceFile: SourceFile,
+  model: DMMF.Model
+) {
+  sourceFile.addStatements(
+    `type ${getModelFactoryParameterTypeName(
+      model
+    )} = ${getModelFactoryParameterInterfaceName(
+      model
+    )} & Partial<Prisma.${camelcase([model.name, 'CreateArgs'], {
+      pascalCase: true,
+    })}>`
+  )
+}
+
 export function addPrismaImportDeclaration(sourceFile: SourceFile) {
   sourceFile.addImportDeclaration({
     moduleSpecifier: '@prisma/client',
@@ -37,7 +55,9 @@ export function getModelFactoryParameterInterfaceProperties(model: DMMF.Model) {
   )
 }
 function getModelFactoryParameterInterfaceName(model: DMMF.Model) {
-  return camelcase(['RequiredParametersFor', model.name, 'creation'], { pascalCase: true })
+  return camelcase(['RequiredParametersFor', model.name, 'creation'], {
+    pascalCase: true,
+  })
 }
 export function addModelFactoryParameterInterface(
   sourceFile: SourceFile,
@@ -95,6 +115,7 @@ export function addModelFactoryDeclaration(
 ) {
   const modelName = model.name
   addModelDefaultValueVariableStatement(sourceFile, model)
+  addModelFactoryParameterType(sourceFile, model)
   addModelFactoryParameterInterface(sourceFile, model)
   sourceFile.addFunction({
     isExported: true,
@@ -103,9 +124,7 @@ export function addModelFactoryDeclaration(
     parameters: [
       {
         name: 'args?',
-        type: `Partial<Prisma.${camelcase([modelName, 'CreateArgs'], {
-          pascalCase: true,
-        })}>`,
+        type: `${getModelFactoryParameterTypeName(model)}`,
       },
     ],
     statements: `
