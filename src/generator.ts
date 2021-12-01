@@ -19,6 +19,40 @@ export function addPrismaImportDeclaration(sourceFile: SourceFile) {
   sourceFile.addStatements(`const prisma = new PrismaClient()`)
 }
 
+export function getModelFactoryParameterInterfaceProperties(model: DMMF.Model) {
+  return Object.fromEntries(
+    model.fields
+      .filter((field) => field.kind === 'object')
+      .map((field) => {
+        return [
+          field.isRequired ? field.name : `${field.name}?`,
+          `Prisma.${camelcase(
+            [field.name, 'CreateNestedOneWithout', model.name, 'Input'],
+            {
+              pascalCase: true,
+            }
+          )}`,
+        ]
+      })
+  )
+}
+function getModelFactoryParameterInterfaceName(model: DMMF.Model) {
+  return camelcase(['RequiredParametersFor', model.name, 'creation'], { pascalCase: true })
+}
+export function addModelFactoryParameterInterface(
+  sourceFile: SourceFile,
+  model: DMMF.Model
+) {
+  const properties = getModelFactoryParameterInterfaceProperties(model)
+  sourceFile.addInterface({
+    name: getModelFactoryParameterInterfaceName(model),
+    properties: Object.keys(properties).map((key) => ({
+      name: key,
+      type: properties[key],
+    })),
+  })
+}
+
 export function getModelDefaultValueVariableInitializer(model: DMMF.Model) {
   return Object.fromEntries(
     model.fields
@@ -37,13 +71,12 @@ export function addModelDefaultValueVariableStatement(
   sourceFile: SourceFile,
   model: DMMF.Model
 ) {
-  const defaultVariableName = camelcase([model.name, 'DefaultVariables'])
   sourceFile.addVariableStatement({
     isExported: true,
     declarationKind: VariableDeclarationKind.Const,
     declarations: [
       {
-        name: defaultVariableName,
+        name: getDefaultVariableName(model),
         initializer: Writers.object(
           getModelDefaultValueVariableInitializer(model)
         ),
@@ -53,13 +86,16 @@ export function addModelDefaultValueVariableStatement(
   })
 }
 
+function getDefaultVariableName(model: DMMF.Model) {
+  return camelcase([model.name, 'DefaultVariables'])
+}
 export function addModelFactoryDeclaration(
   sourceFile: SourceFile,
   model: DMMF.Model
 ) {
   const modelName = model.name
-  const defaultVariableName = `${modelName}DefaultVariables`
   addModelDefaultValueVariableStatement(sourceFile, model)
+  addModelFactoryParameterInterface(sourceFile, model)
   sourceFile.addFunction({
     isExported: true,
     isAsync: true,
@@ -75,7 +111,7 @@ export function addModelFactoryDeclaration(
     statements: `
       return await prisma.${camelcase(modelName)}.create({
         data: {
-          ...${defaultVariableName},
+          ...${getDefaultVariableName(model)},
           ...args.data,
         }
       })

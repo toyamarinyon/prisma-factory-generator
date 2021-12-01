@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`snapshot 1`] = `
+"interface RequiredParametersForUserCreation {
+    accessToken?: Prisma.AccessTokenCreateNestedOneWithoutUserInput;
+}
+"
+`;
+
+exports[`snapshot 2`] = `
+"interface RequiredParametersForAccessTokenCreation {
+    user: Prisma.UserCreateNestedOneWithoutAccessTokenInput;
+}
+"
+`;
