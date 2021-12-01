@@ -2,6 +2,7 @@ import { DMMF } from '@prisma/client/runtime'
 import camelcase from 'camelcase'
 import { fakerForField } from './helper'
 import { SourceFile, VariableDeclarationKind, Writers } from 'ts-morph'
+import pluralize from 'pluralize'
 
 function getModelFactoryParameterTypeName(model: DMMF.Model) {
   return camelcase(['create', model.name, 'Args'])
@@ -42,10 +43,19 @@ export function getModelFactoryParameterInterfaceProperties(model: DMMF.Model) {
     model.fields
       .filter((field) => field.kind === 'object')
       .map((field) => {
+        const relationKind = field.isList ? 'many' : 'one'
+        const isOptional = !field.isRequired || field.isList
         return [
-          field.isRequired ? field.name : `${field.name}?`,
+          isOptional ? `${field.name}?` : field.name,
           `Prisma.${camelcase(
-            [field.name, 'CreateNestedOneWithout', model.name, 'Input'],
+            [
+              field.name,
+              'CreateNested',
+              relationKind,
+              'Without',
+              model.name,
+              'Input',
+            ],
             {
               pascalCase: true,
             }
