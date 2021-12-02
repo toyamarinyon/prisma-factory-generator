@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`snapshot 1`] = `
+"export function inputsForUser() {
+    return {
+        email: faker.name.title(),
+    }
+}
+"
+`;

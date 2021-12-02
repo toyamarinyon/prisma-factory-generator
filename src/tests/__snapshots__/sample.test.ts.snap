@@ -3,11 +3,13 @@
 exports[`generate model 1`] = `
 "import { PrismaClient } from \\"@prisma/client\\"
 import { Prisma } from \\".prisma/client\\"
-import faker from \\"faker\\"
+import * as faker from \\"faker\\"
 const prisma = new PrismaClient()
 
-export const userDefaultVariables = {
-  email: faker.name.title()
+export function inputsForUser() {
+  return {
+    email: faker.name.title(),
+  }
 }
 type createUserArgs = RequiredParametersForUserCreation & Partial<Prisma.UserCreateArgs>
 
@@ -19,27 +21,29 @@ export async function createUser(args?: createUserArgs) {
 
   return await prisma.user.create({
     data: {
-      ...userDefaultVariables,
-      ...args.data,
+      ...inputsForUser(),
+      ...args,
     }
   })
 
 }
 
-
-export const accessTokenDefaultVariables = {}
+export function inputsForAccessToken() {
+  return {
+  }
+}
 type createAccessTokenArgs = RequiredParametersForAccessTokenCreation & Partial<Prisma.AccessTokenCreateArgs>
 
 interface RequiredParametersForAccessTokenCreation {
   user: Prisma.UserCreateNestedOneWithoutAccessTokenInput
 }
 
-export async function createAccessToken(args?: createAccessTokenArgs) {
+export async function createAccessToken(args: createAccessTokenArgs) {
 
   return await prisma.accessToken.create({
     data: {
-      ...accessTokenDefaultVariables,
-      ...args.data,
+      ...inputsForAccessToken(),
+      ...args,
     }
   })
 

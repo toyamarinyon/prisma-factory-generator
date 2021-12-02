@@ -1,6 +1,10 @@
 import { getDMMF } from '@prisma/sdk'
-import { getModelDefaultValueVariableInitializer } from '../generator'
+import {
+  addModelAttributeForFunction,
+  getModelDefaultValueVariableInitializer,
+} from '../generator'
 import { DMMF } from '@prisma/generator-helper'
+import { Project } from 'ts-morph'
 
 const datamodel = /* Prisma */ `
 model User {
@@ -23,11 +27,13 @@ model AccessToken {
 `
 
 let dmmf: DMMF.Document
+let userModel: DMMF.Model
 let accessTokenModel: DMMF.Model
 let initializer: Record<string, any>
 
 beforeAll(async () => {
   dmmf = await getDMMF({ datamodel })
+  userModel = dmmf.datamodel.models[0]
   accessTokenModel = dmmf.datamodel.models[1]
   initializer = getModelDefaultValueVariableInitializer(accessTokenModel)
 })
@@ -47,4 +53,11 @@ test('@relation id field is not generate', () => {
 test('set @default field is not generate', () => {
   expect(initializer.createdAt).toBeUndefined()
   expect(initializer.isActive).toBeUndefined()
+})
+
+test('snapshot', () => {
+  const project = new Project()
+  const sourceFile = project.createSourceFile('tmp')
+  addModelAttributeForFunction(sourceFile, userModel)
+  expect(sourceFile.getText()).toMatchSnapshot()
 })
