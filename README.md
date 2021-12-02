@@ -72,14 +72,14 @@ console.log(user)
  */
 
 // Create a post (the title and body will be created by faker, and the user will be connected to the one created above).
-const post = await createPost({
+const postConnectUser = await createPost({
   user: {
     connect: {
       id: user.id,
     },
   },
 })
-console.log(post)
+console.log(postConnectUser)
 /**
  * {
  *  id: 1,
@@ -91,6 +91,23 @@ console.log(post)
  *  }
  */
 
+// As an alternative, you can create users at the same time. In this case, you can use the function `inputsForUser` to set the parameters needed to create a user.
+const postCreateUser = await createPost({
+  user: {
+    create: inputsForUser(),
+  },
+})
+console.log(postCreateUser)
+/**
+ * {
+ *  id: 6,
+ *  userId: 6,
+ *  title: 'Future Accountability Officer',
+ *  body: 'Lead Usability Specialist',
+ *  createdAt: 2021-12-02T13:28:21.541Z,
+ *  updatedAt: 2021-12-02T13:28:21.541Z
+ *  }
+ */
 
 // Create a comment (the body will be created by faker, the approved will be set to the DB default, and the user and post will be connected to the one created above).
 const comment = await createComment({
