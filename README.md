@@ -1,6 +1,3 @@
-
-> This package under developing now. Right now, we can only generate factories for models without relations.
-
 Automatically generate a factory from your Prisma Schema. This package contains a prisma generator so reference will automatically update everytime you will run `prisma generate`
 
 There is a scheme that looks like this
