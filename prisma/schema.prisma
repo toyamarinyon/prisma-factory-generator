@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
@@ -15,30 +15,37 @@ generator factory {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  createdAt   DateTime     @default(now()) @map(name: "created_at")
-  updatedAt   DateTime     @default(now()) @map(name: "updated_at")
-  accessToken AccessToken?
-  uuid        String       @unique @default(uuid())
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  userName String    @unique
+  posts    Post[]
+  comments Comment[]
 
   @@map(name: "users")
 }
 
-model RelationA {
-  id          Int           @id @default(autoincrement())
-  AccessToken AccessToken[]
+model Post {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int       @unique @map(name: "user_id")
+  title     String
+  body      String
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @default(now()) @map(name: "updated_at")
+  comments  Comment[]
+
+  @@map("posts")
 }
 
-model AccessToken {
-  id          Int       @id @default(autoincrement())
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int       @unique @map(name: "user_id")
-  relationA   RelationA @relation(fields: [relationAId], references: [id])
-  relationAId Int       @unique @map(name: "relation_a_id")
-  createdAt   DateTime  @default(now()) @map(name: "created_at")
-  paidAmount  Int       @map(name: "paid_amount")
-  isActive    Boolean   @default(false)
+model Comment {
+  id        Int      @id @default(autoincrement())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int      @unique @map(name: "post_id")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique @map(name: "user_id")
+  body      String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  approved  Boolean  @default(false)
 
-  @@map("access_tokens")
+  @@map("comments")
 }
