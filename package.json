@@ -1,6 +1,6 @@
 {
   "name": "prisma-factory-generator",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Factory generator for Prisma Schema",
   "repository": "https://github.com/toyamarinyon/prisma-factory-generator",
   "author": "@toyamarinyon",
