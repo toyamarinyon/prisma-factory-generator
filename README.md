@@ -1,7 +1,7 @@
 Automatically generate a factory from your Prisma Schema. This package contains a prisma generator so reference will automatically update everytime you will run `prisma generate`
 
 There is a scheme that looks like this
-```
+```prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
