@@ -38,22 +38,44 @@ export function addPrismaImportDeclaration(sourceFile: SourceFile) {
   sourceFile.addStatements(`const prisma = new PrismaClient()`)
 }
 
-export function getModelFactoryParameterInterfaceProperties(model: DMMF.Model) {
+export function getModelFactoryParameterInterfaceProperties(
+  model: DMMF.Model,
+  models: DMMF.Model[]
+) {
   return Object.fromEntries(
     model.fields
       .filter((field) => field.kind === 'object')
       .map((field) => {
         const relationKind = field.isList ? 'many' : 'one'
         const isOptional = !field.isRequired || field.isList
+        const relationDest = models.find((m) => {
+          if (m.name === model.name) {
+            return false
+          }
+          return m.fields.find((f) => f.relationName === field.relationName)
+        })
+        if (!relationDest) {
+          throw new Error(
+            `missing relation dest error, model: ${model.name}, field: ${field.name}`
+          )
+        }
+
+        const relationField = relationDest?.fields.find(
+          (f) => f.relationName === field.relationName
+        )
+        if (!relationField) {
+          throw new Error('missing relation field error')
+        }
+
         return [
           isOptional ? `${field.name}?` : field.name,
           `Prisma.${camelcase(
             [
-              field.name,
+              relationKind === 'one' ? field.name : field.type.toString(),
               'CreateNested',
               relationKind,
               'Without',
-              model.name,
+              relationField.name,
               'Input',
             ],
             {
@@ -71,9 +93,10 @@ function getModelFactoryParameterInterfaceName(model: DMMF.Model) {
 }
 export function addModelFactoryParameterInterface(
   sourceFile: SourceFile,
-  model: DMMF.Model
+  model: DMMF.Model,
+  models: DMMF.Model[]
 ) {
-  const properties = getModelFactoryParameterInterfaceProperties(model)
+  const properties = getModelFactoryParameterInterfaceProperties(model, models)
   sourceFile.addInterface({
     name: getModelFactoryParameterInterfaceName(model),
     properties: Object.keys(properties).map((key) => ({
@@ -81,6 +104,7 @@ export function addModelFactoryParameterInterface(
       type: properties[key],
     })),
   })
+  return Object.keys(properties).some((key) => !key.endsWith('?'))
 }
 
 export function getModelDefaultValueVariableInitializer(model: DMMF.Model) {
@@ -121,19 +145,24 @@ function getDefaultVariableName(model: DMMF.Model) {
 }
 export function addModelFactoryDeclaration(
   sourceFile: SourceFile,
-  model: DMMF.Model
+  model: DMMF.Model,
+  models: DMMF.Model[]
 ) {
   const modelName = model.name
   addModelDefaultValueVariableStatement(sourceFile, model)
   addModelFactoryParameterType(sourceFile, model)
-  addModelFactoryParameterInterface(sourceFile, model)
+  const hasRequiredParameters = addModelFactoryParameterInterface(
+    sourceFile,
+    model,
+    models
+  )
   sourceFile.addFunction({
     isExported: true,
     isAsync: true,
     name: camelcase(['create', modelName]),
     parameters: [
       {
-        name: 'args?',
+        name: hasRequiredParameters ? 'args' : 'args?',
         type: `${getModelFactoryParameterTypeName(model)}`,
       },
     ],
@@ -141,7 +170,7 @@ export function addModelFactoryDeclaration(
       return await prisma.${camelcase(modelName)}.create({
         data: {
           ...${getDefaultVariableName(model)},
-          ...args.data,
+          ...args,
         }
       })
     `,

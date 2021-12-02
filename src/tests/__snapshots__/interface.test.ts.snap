@@ -3,7 +3,7 @@
 exports[`snapshot 1`] = `
 "interface RequiredParametersForUserCreation {
     accessToken?: Prisma.AccessTokenCreateNestedOneWithoutUserInput;
-    posts?: Prisma.PostsCreateNestedManyWithoutUserInput;
+    posts?: Prisma.PostCreateNestedManyWithoutUserInput;
 }
 "
 `;

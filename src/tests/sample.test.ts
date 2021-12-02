@@ -32,7 +32,7 @@ test('generate model', async () => {
   const dmmf = await getDMMF({ datamodel })
   addPrismaImportDeclaration(sourceFile)
   dmmf.datamodel.models.forEach((model) => {
-    addModelFactoryDeclaration(sourceFile, model)
+    addModelFactoryDeclaration(sourceFile, model, dmmf.datamodel.models)
   })
 
   sourceFile.formatText({

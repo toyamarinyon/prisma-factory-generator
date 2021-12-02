@@ -38,18 +38,30 @@ model Post {
 
 let dmmf: DMMF.Document
 let userModel: DMMF.Model
+let userInterfaceProperties: Record<string, any>
 let accessTokenModel: DMMF.Model
 let accessTokenInterfaceProperties: Record<string, any>
-let userInterfaceProperties: Record<string, any>
+let postModel: DMMF.Model
+let postInterfaceProperties: Record<string, any>
 
 beforeAll(async () => {
   dmmf = await getDMMF({ datamodel })
-  userModel = dmmf.datamodel.models[0]
-  accessTokenModel = dmmf.datamodel.models[1]
-  userInterfaceProperties =
-    getModelFactoryParameterInterfaceProperties(userModel)
-  accessTokenInterfaceProperties =
-    getModelFactoryParameterInterfaceProperties(accessTokenModel)
+  const models = dmmf.datamodel.models
+  userModel = models[0]
+  userInterfaceProperties = getModelFactoryParameterInterfaceProperties(
+    userModel,
+    models
+  )
+  accessTokenModel = models[1]
+  accessTokenInterfaceProperties = getModelFactoryParameterInterfaceProperties(
+    accessTokenModel,
+    models
+  )
+  postModel = models[2]
+  postInterfaceProperties = getModelFactoryParameterInterfaceProperties(
+    postModel,
+    models
+  )
 })
 
 test('@id field is not generate', () => {
@@ -57,7 +69,6 @@ test('@id field is not generate', () => {
 })
 
 test('@relation field is generate', () => {
-  console.info(accessTokenInterfaceProperties)
   expect(accessTokenInterfaceProperties.user).toBeDefined()
   expect(accessTokenInterfaceProperties.user).toBe(
     'Prisma.UserCreateNestedOneWithoutAccessTokenInput'
@@ -77,20 +88,26 @@ test('optional @relation field is generate', () => {
 })
 
 test('list field is generate as optional', () => {
-  console.info(userInterfaceProperties)
   expect(userInterfaceProperties['posts?']).toBe(
-    'Prisma.PostsCreateNestedManyWithoutUserInput'
+    'Prisma.PostCreateNestedManyWithoutUserInput'
+  )
+})
+
+test('list reference field is generate', () => {
+  expect(postInterfaceProperties['user']).toBe(
+    'Prisma.UserCreateNestedOneWithoutPostsInput'
   )
 })
 
 test('snapshot', () => {
   const project = new Project()
   const userInterfaceFile = project.createSourceFile('tmp1')
-  addModelFactoryParameterInterface(userInterfaceFile, userModel)
+  const models = dmmf.datamodel.models
+  addModelFactoryParameterInterface(userInterfaceFile, userModel, models)
   expect(userInterfaceFile.getText()).toMatchSnapshot()
 
   const accessToken = project.createSourceFile('tmp2')
-  addModelFactoryParameterInterface(accessToken, accessTokenModel)
+  addModelFactoryParameterInterface(accessToken, accessTokenModel, models)
   expect(accessToken.getText()).toMatchSnapshot()
 })
 

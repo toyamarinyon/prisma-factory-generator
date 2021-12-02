@@ -1,6 +1,5 @@
 import { getDMMF } from '@prisma/sdk'
 import {
-  addModelFactoryParameterInterface,
   addModelFactoryParameterType,
   getModelFactoryParameterInterfaceProperties,
 } from '../generator'
@@ -30,17 +29,12 @@ model AccessToken {
 let dmmf: DMMF.Document
 let userModel: DMMF.Model
 let accessTokenModel: DMMF.Model
-let accessTokenInterfaceProperties: Record<string, any>
-let userInterfaceProperties: Record<string, any>
 
 beforeAll(async () => {
   dmmf = await getDMMF({ datamodel })
-  userModel = dmmf.datamodel.models[0]
-  accessTokenModel = dmmf.datamodel.models[1]
-  userInterfaceProperties =
-    getModelFactoryParameterInterfaceProperties(userModel)
-  accessTokenInterfaceProperties =
-    getModelFactoryParameterInterfaceProperties(accessTokenModel)
+  const models = dmmf.datamodel.models
+  userModel = models[0]
+  accessTokenModel = models[1]
 })
 
 test('snapshot', () => {

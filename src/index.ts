@@ -28,8 +28,9 @@ generatorHandler({
         }
       )
       addPrismaImportDeclaration(sourceFile)
+      const models = options.dmmf.datamodel.models
       options.dmmf.datamodel.models.forEach((model) => {
-        addModelFactoryDeclaration(sourceFile, model)
+        addModelFactoryDeclaration(sourceFile, model, models)
       })
       sourceFile.formatText({
         indentSize: 2,
@@ -40,31 +41,7 @@ generatorHandler({
         await fs.promises.mkdir(output, {
           recursive: true,
         })
-
         await sourceFile.save()
-        // await sourceFile.save()
-        //         await fs.promises.writeFile(
-        //           path.join(output, 'output.ts'),
-        //           `
-        // import { PrismaClient } from '@prisma/client'
-        // import { Prisma } from '.prisma/client'
-        // const prisma = new PrismaClient()
-
-        // export async function createStudent(args: Prisma.StudentCreateArgs) {
-        //   return prisma.student.create({
-        //     data: {
-        //       ...{
-        //         lastName: 'last',
-        //         firstName: 'fiist',
-        //         email: 'satoshi',
-        //       },
-        //       ...args.data,
-        //     },
-        //   })
-        // }
-
-        // `
-        //         )
       } catch (e) {
         console.error(
           'Error: unable to write files for Prisma Factory Generator'
