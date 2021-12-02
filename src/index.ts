@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import { generatorHandler } from '@prisma/generator-helper'
-import { Project, ts } from 'ts-morph'
+import { ModuleKind, Project, ts } from 'ts-morph'
 import * as fs from 'fs'
+import * as path from 'path'
 import {
   addPrismaImportDeclaration,
   addModelFactoryDeclaration,
@@ -19,7 +20,9 @@ generatorHandler({
     const output = options.generator.output?.value
 
     if (output) {
-      const project = new Project({})
+      const project = new Project({
+        compilerOptions: { declaration: true, module: ModuleKind.CommonJS },
+      })
       const sourceFile = project.createSourceFile(
         `${output}/index.ts`,
         undefined,
@@ -41,7 +44,19 @@ generatorHandler({
         await fs.promises.mkdir(output, {
           recursive: true,
         })
-        await sourceFile.save()
+        await sourceFile.emit()
+
+        const packageJsonTargetPath = path.join(output, 'package.json')
+        const pkgJson = JSON.stringify(
+          {
+            name: '.prisma/client',
+            main: 'index.js',
+            types: 'index.d.ts',
+          },
+          null,
+          2
+        )
+        await fs.promises.writeFile(packageJsonTargetPath, pkgJson)
       } catch (e) {
         console.error(
           'Error: unable to write files for Prisma Factory Generator'

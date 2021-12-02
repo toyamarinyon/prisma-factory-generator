@@ -33,7 +33,7 @@ export function addPrismaImportDeclaration(sourceFile: SourceFile) {
   })
   sourceFile.addImportDeclaration({
     moduleSpecifier: 'faker',
-    defaultImport: 'faker',
+    namespaceImport: 'faker',
   })
   sourceFile.addStatements(`const prisma = new PrismaClient()`)
 }
