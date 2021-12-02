@@ -58,10 +58,10 @@ generator factory {
 3. Run `npx prisma generate` to trigger the generator. This will create a `factory` folder in `node_modules/.prisma/factory`
 
 ## To Do
-- [ ] relation factory
-  - [ ] one to one
-  - [ ] one to many
-  - [ ] many to many
+- [x] relation factory
+  - [x] one to one
+  - [x] one to many
+  - [x] many to many
 
 ---
 
