@@ -168,3 +168,4 @@ generator factory {
 MIT
 
 (This is not an official Prisma project. It is personally maintained by [me](https://github.com/toyamarinyon) )
+# amplify-studio-demo
