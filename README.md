@@ -157,6 +157,61 @@ generator factory {
 
 3. Run `npx prisma generate` to trigger the generator. This will create a `factory` folder in `node_modules/.prisma/factory`
 
+## Seeding data using a factory
+
+This factory can be used when creating data with the seed function provided in Prisma.
+
+1. Prepare the seed script by referring to the Prisma documentation.
+[Seeding your database / Prisma documentation](https://www.prisma.io/docs/guides/database/seed-database)
+2. Rewrite the `main` of the seed script to use the factory. Below is an example.
+```typescript
+// prisma/seed.ts
+import {
+  createUser,
+  createPost,
+  createComment,
+  inputsForUser,
+} from '.prisma/factory'
+async function main() {
+  const user = await createUser()
+  console.log(user)
+
+  const postConnectUser = await createPost({
+    user: {
+      connect: {
+        id: user.id,
+      },
+    },
+  })
+  console.log(postConnectUser)
+
+  const postCreateUser = await createPost({
+    user: {
+      create: inputsForUser(),
+    },
+  })
+  console.log(postCreateUser)
+
+  const comment = await createComment({
+    user: {
+      connect: {
+        id: user.id,
+      },
+    },
+    post: {
+      connect: {
+        id: postConnectUser.id,
+      },
+    },
+  })
+  console.log(comment)
+}
+
+main().catch((e) => console.error(e.toString()))
+```
+3. Run `npx prisma db seed` to create a seed using the factory
+
+
 ## To Do
 - [ ] attributesForUser
 - [ ] createUserCollection
@@ -168,4 +223,4 @@ generator factory {
 MIT
 
 (This is not an official Prisma project. It is personally maintained by [me](https://github.com/toyamarinyon) )
-# amplify-studio-demo
+
