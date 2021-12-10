@@ -1,10 +1,11 @@
 {
   "name": "prisma-factory-generator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Factory generator for Prisma Schema",
   "repository": "https://github.com/toyamarinyon/prisma-factory-generator",
   "author": "@toyamarinyon",
   "license": "MIT",
+  "main": "dist/index.js",
   "dependencies": {
     "@prisma/generator-helper": "^3.5.0",
     "@prisma/sdk": "^3.5.0",
