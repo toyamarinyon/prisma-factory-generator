@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 
 export function inputsForUser() {
   return {
-    email: faker.name.title(),
+    email: faker.internet.email(),
   }
 }
 type createUserArgs = RequiredParametersForUserCreation & Partial<Prisma.UserCreateArgs>
