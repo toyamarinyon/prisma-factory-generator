@@ -1,10 +1,14 @@
 import * as faker from 'faker'
 import { DMMF } from '@prisma/client/runtime'
 
-export function fakerForNameFiled(fieldName: string) {
+export function fakerForStringField(fieldName: string) {
   const nameFieldFakers = Object.keys(faker.name)
   if (nameFieldFakers.includes(fieldName)) {
     return `faker.name.${fieldName}()`
+  }
+  const internetFakers = Object.keys(faker.internet)
+  if (internetFakers.includes(fieldName)) {
+    return `faker.internet.${fieldName}()`
   }
   return 'faker.name.title()'
 }
@@ -13,7 +17,7 @@ export function fakerForField(field: DMMF.Field) {
   const fieldType = field.type
   const fieldKind = field.kind
   if (fieldType === 'String') {
-    return 'faker.name.title()'
+    return fakerForStringField(field.name)
   }
   if (fieldType === 'Int' || fieldType === 'BigInt') {
     return 'faker.datatype.number()'

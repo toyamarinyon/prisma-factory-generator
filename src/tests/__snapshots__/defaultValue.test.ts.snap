@@ -3,7 +3,7 @@
 exports[`snapshot 1`] = `
 "export function inputsForUser() {
     return {
-        email: faker.name.title(),
+        email: faker.internet.email(),
     }
 }
 "
