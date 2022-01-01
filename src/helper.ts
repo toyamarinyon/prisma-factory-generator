@@ -1,4 +1,13 @@
+import * as faker from 'faker'
 import { DMMF } from '@prisma/client/runtime'
+
+export function fakerForNameFiled(fieldName: string) {
+  const nameFieldFakers = Object.keys(faker.name)
+  if (nameFieldFakers.includes(fieldName)) {
+    return `faker.name.${fieldName}()`
+  }
+  return 'faker.name.title()'
+}
 
 export function fakerForField(field: DMMF.Field) {
   const fieldType = field.type
@@ -19,7 +28,7 @@ export function fakerForField(field: DMMF.Field) {
     return 'faker.datatype.datetime()'
   }
   if (fieldType === 'Boolean') {
-    return field.default as string ?? false
+    return (field.default as string) ?? false
   }
   throw new Error(`${fieldType} isn't support now. kind: ${fieldKind}`)
 }
