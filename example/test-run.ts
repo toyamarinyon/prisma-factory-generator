@@ -7,6 +7,7 @@ import {
 async function main() {
   const user = await createUser()
   console.log(user)
+
   const newUser = await createUser({
     data: { userName: 'hello!' },
   })
