@@ -11,19 +11,19 @@ export function inputsForUser() {
     email: faker.internet.email(),
   }
 }
-type createUserArgs = RequiredParametersForUserCreation & Partial<Prisma.UserCreateArgs>
 
-interface RequiredParametersForUserCreation {
-  accessToken?: Prisma.AccessTokenCreateNestedOneWithoutUserInput
-}
+type UserFactoryArgs = Omit<Prisma.UserCreateArgs, 'data'> & {
+  data: Pick<Prisma.UserCreateInput, 'accessToken'> & Partial<Omit<Prisma.UserCreateInput, 'accessToken'>>
+} | undefined
 
-export async function createUser(args?: createUserArgs) {
+export async function createUser(args?: UserFactoryArgs) {
 
   return await prisma.user.create({
+    ...args,
     data: {
       ...inputsForUser(),
-      ...args,
-    }
+      ...args?.data
+    },
   })
 
 }
@@ -32,19 +32,19 @@ export function inputsForAccessToken() {
   return {
   }
 }
-type createAccessTokenArgs = RequiredParametersForAccessTokenCreation & Partial<Prisma.AccessTokenCreateArgs>
 
-interface RequiredParametersForAccessTokenCreation {
-  user: Prisma.UserCreateNestedOneWithoutAccessTokenInput
+type AccessTokenFactoryArgs = Omit<Prisma.AccessTokenCreateArgs, 'data'> & {
+  data: Pick<Prisma.AccessTokenCreateInput, 'user'> & Partial<Omit<Prisma.AccessTokenCreateInput, 'user'>>
 }
 
-export async function createAccessToken(args: createAccessTokenArgs) {
+export async function createAccessToken(args: AccessTokenFactoryArgs) {
 
   return await prisma.accessToken.create({
+    ...args,
     data: {
       ...inputsForAccessToken(),
-      ...args,
-    }
+      ...args?.data
+    },
   })
 
 }

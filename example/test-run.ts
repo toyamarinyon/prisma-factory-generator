@@ -7,33 +7,42 @@ import {
 async function main() {
   const user = await createUser()
   console.log(user)
+  const newUser = await createUser({
+    data: { userName: 'hello!' },
+  })
+  console.log(newUser)
 
   const postConnectUser = await createPost({
-    user: {
-      connect: {
-        id: user.id,
+    data: {
+      user: {
+        connect: {
+          id: user.id,
+        },
       },
     },
   })
   console.log(postConnectUser)
 
   const postCreateUser = await createPost({
-    user: {
-      create: inputsForUser(),
+    data: {
+      user: {
+        create: inputsForUser(),
+      },
     },
   })
   console.log(postCreateUser)
 
-
   const comment = await createComment({
-    user: {
-      connect: {
-        id: user.id,
+    data: {
+      user: {
+        connect: {
+          id: user.id,
+        },
       },
-    },
-    post: {
-      connect: {
-        id: postConnectUser.id,
+      post: {
+        connect: {
+          id: postConnectUser.id,
+        },
       },
     },
   })

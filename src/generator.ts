@@ -1,7 +1,9 @@
 import { DMMF } from '@prisma/client/runtime'
 import camelcase from 'camelcase'
 import { fakerForField } from './helper'
-import { SourceFile, VariableDeclarationKind, Writers } from 'ts-morph'
+import { SourceFile } from 'ts-morph'
+import { args, factoryArgsTypeName } from './args'
+import { hasRequiredRelation } from './relation'
 
 function getModelFactoryParameterTypeName(model: DMMF.Model) {
   return camelcase(['create', model.name, 'Args'])
@@ -151,28 +153,25 @@ export function addModelFactoryDeclaration(
 ) {
   const modelName = model.name
   addModelAttributeForFunction(sourceFile, model)
-  addModelFactoryParameterType(sourceFile, model)
-  const hasRequiredParameters = addModelFactoryParameterInterface(
-    sourceFile,
-    model,
-    models
-  )
+  args(sourceFile, model, models)
+  const isRequired = hasRequiredRelation(model, models)
   sourceFile.addFunction({
     isExported: true,
     isAsync: true,
     name: camelcase(['create', modelName]),
     parameters: [
       {
-        name: hasRequiredParameters ? 'args' : 'args?',
-        type: `${getModelFactoryParameterTypeName(model)}`,
+        name: isRequired ? 'args' : 'args?',
+        type: `${factoryArgsTypeName(model)}`,
       },
     ],
     statements: `
       return await prisma.${camelcase(modelName)}.create({
+        ...args,
         data: {
           ...${getAttributesForFunctionName(model)}(),
-          ...args,
-        }
+          ...args?.data
+        },
       })
     `,
   })
