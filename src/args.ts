@@ -20,15 +20,18 @@ export function args(
     pascalCase: true,
   })
   const relationFields = getRelationFields(model, models)
-  const isRequire = hasRequiredRelation(model, models)
+  const hasRelationFields = relationFields.length > 0
+  const data = hasRelationFields
+    ? `Pick<Prisma.${createInputTypeName}, '${relationFields.join(
+        "'|'"
+      )}'> & Partial<Omit<Prisma.${createInputTypeName}, '${relationFields.join(
+        "'|'"
+      )}'>>`
+    : `Partial<Prisma.${createInputTypeName}>`
   sourceFile.addStatements(`
 type ${factoryArgsTypeName(
     model
   )} = Omit<Prisma.${createArgsTypeName}, 'data'> & {
-  data: Pick<Prisma.${createInputTypeName}, '${relationFields.join(
-    "'|'"
-  )}'> & Partial<Omit<Prisma.${createInputTypeName}, '${relationFields.join(
-    "'|'"
-  )}'>>
-}${isRequire ? '' : ' | undefined'}`)
+  data: ${data}
+}`)
 }

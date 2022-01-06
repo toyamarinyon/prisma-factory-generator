@@ -14,7 +14,7 @@ export function inputsForUser() {
 
 type UserFactoryArgs = Omit<Prisma.UserCreateArgs, 'data'> & {
   data: Pick<Prisma.UserCreateInput, 'accessToken'> & Partial<Omit<Prisma.UserCreateInput, 'accessToken'>>
-} | undefined
+}
 
 export async function createUser(args?: UserFactoryArgs) {
 

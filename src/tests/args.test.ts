@@ -32,12 +32,18 @@ model Post {
 
   @@map("posts")
 }
+
+model Lecture {
+  id        Int       @id @default(autoincrement())
+  title     String
+}
 `
 
 let dmmf: DMMF.Document
 let userModel: DMMF.Model
 let accessTokenModel: DMMF.Model
 let postModel: DMMF.Model
+let lectureModel: DMMF.Model
 
 beforeAll(async () => {
   dmmf = await getDMMF({ datamodel })
@@ -45,6 +51,7 @@ beforeAll(async () => {
   userModel = models[0]
   accessTokenModel = models[1]
   postModel = models[2]
+  lectureModel = models[3]
 })
 
 test('print type definition', () => {
@@ -55,7 +62,7 @@ test('print type definition', () => {
   const userFactoryArgs = `
 type UserFactoryArgs = Omit<Prisma.UserCreateArgs, 'data'> & {
   data: Pick<Prisma.UserCreateInput, 'accessToken'|'posts'> & Partial<Omit<Prisma.UserCreateInput, 'accessToken'|'posts'>>
-} | undefined
+}
 `
   args(userSource, userModel, models)
   expect(userSource.getFullText()).toEqual(userFactoryArgs)
@@ -77,4 +84,14 @@ type PostFactoryArgs = Omit<Prisma.PostCreateArgs, 'data'> & {
 `
   args(postSource, postModel, models)
   expect(postSource.getFullText()).toEqual(postArgs)
+
+  const lectureSource = project.createSourceFile('tmp4')
+  const lectureArgs = `
+type LectureFactoryArgs = Omit<Prisma.LectureCreateArgs, 'data'> & {
+  data: Partial<Prisma.LectureCreateInput>
+}
+`
+  args(lectureSource, lectureModel, models)
+  expect(lectureSource.getFullText()).toEqual(lectureArgs)
+
 })
