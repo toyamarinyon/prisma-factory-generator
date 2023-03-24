@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 
 export function inputsForUser() {
   return {
-    email: faker.internet.email(),
+    email: faker.internet.email(), jsonProp: faker.datatype.json(),
   }
 }
 

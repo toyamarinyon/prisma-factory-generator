@@ -34,5 +34,8 @@ export function fakerForField(field: DMMF.Field) {
   if (fieldType === 'Boolean') {
     return (field.default as string) ?? false
   }
-  throw new Error(`${fieldType} isn't support now. kind: ${fieldKind}`)
+  if (fieldType === 'Json') {
+    return 'faker.datatype.json()'
+  }
+  throw new Error(`${fieldType} isn't supported. kind: ${fieldKind}`)
 }
