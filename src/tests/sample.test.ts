@@ -8,6 +8,7 @@ const datamodel = /* Prisma */ `
 model User {
   id          Int          @id @default(autoincrement())
   email       String       @unique
+  jsonProp    Json
   accessToken AccessToken?
 
   @@map(name: "users")
