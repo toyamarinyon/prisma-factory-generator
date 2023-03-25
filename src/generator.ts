@@ -94,19 +94,21 @@ function getModelFactoryParameterInterfaceName(model: DMMF.Model) {
 }
 export function addModelAttributeForFunction(
   sourceFile: SourceFile,
-  model: DMMF.Model
+  model: DMMF.Model,
+  enums: DMMF.DatamodelEnum[]
 ) {
   sourceFile.addFunction({
     isExported: true,
     name: getAttributesForFunctionName(model),
     statements: (writer) => {
       writer.write('return').block(() => {
-        const initializer = getModelDefaultValueVariableInitializer(model)
-        Object.keys(getModelDefaultValueVariableInitializer(model)).map(
-          (key) => {
-            writer.write(`${key}: ${initializer[key]},`)
-          }
+        const initializer = getModelDefaultValueVariableInitializer(
+          model,
+          enums
         )
+        Object.keys(initializer).map((key) => {
+          writer.write(`${key}: ${initializer[key]},`)
+        })
       })
     },
   })
@@ -127,28 +129,32 @@ export function addModelFactoryParameterInterface(
   return Object.keys(properties).some((key) => !key.endsWith('?'))
 }
 
-export function getModelDefaultValueVariableInitializer(model: DMMF.Model) {
-  const fields = model.fields
+export function getModelDefaultValueVariableInitializer(
+  model: DMMF.Model,
+  enums: DMMF.DatamodelEnum[]
+) {
+  const validFields = model.fields
     .filter((field) => !field.isId)
-    .filter((field) => field.kind === 'scalar')
+    .filter((field) => field.kind === 'scalar' || field.kind === 'enum')
     .filter((field) => {
       return !model.fields.find((it) => {
         return it.relationFromFields?.includes(field.name)
       })
     })
     .filter((field) => !field.hasDefaultValue)
+
+  const nonListFields = validFields.filter((field) => !field.isList)
+  const listFields = validFields.filter((field) => field.isList)
+
   return Object.fromEntries([
-    ...fields
-      .filter((field) => !field.isList)
-      .map((field) => [field.name, fakerForField(field)]),
-    ...fields
-      .filter((field) => field.isList)
-      .map((field) => [
-        field.name,
-        `[${fakerForField(field)},${fakerForField(field)},${fakerForField(
-          field
-        )}]`,
-      ]),
+    ...nonListFields.map((field) => [field.name, fakerForField(field, enums)]),
+    ...listFields.map((field) => [
+      field.name,
+      `[${fakerForField(field, enums)},${fakerForField(
+        field,
+        enums
+      )},${fakerForField(field, enums)}]`,
+    ]),
   ])
 }
 
@@ -159,10 +165,11 @@ function getAttributesForFunctionName(model: DMMF.Model) {
 export function addModelFactoryDeclaration(
   sourceFile: SourceFile,
   model: DMMF.Model,
-  models: DMMF.Model[]
+  models: DMMF.Model[],
+  enums: DMMF.DatamodelEnum[]
 ) {
   const modelName = model.name
-  addModelAttributeForFunction(sourceFile, model)
+  addModelAttributeForFunction(sourceFile, model, enums)
   args(sourceFile, model, models)
   const isRequired = hasRequiredRelation(model, models)
   sourceFile.addFunction({

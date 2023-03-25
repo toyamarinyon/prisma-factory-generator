@@ -32,8 +32,9 @@ generatorHandler({
       )
       addPrismaImportDeclaration(sourceFile)
       const models = options.dmmf.datamodel.models
+      const enums = options.dmmf.datamodel.enums
       options.dmmf.datamodel.models.forEach((model) => {
-        addModelFactoryDeclaration(sourceFile, model, models)
+        addModelFactoryDeclaration(sourceFile, model, models, enums)
       })
       sourceFile.formatText({
         indentSize: 2,
