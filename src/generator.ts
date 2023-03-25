@@ -128,18 +128,28 @@ export function addModelFactoryParameterInterface(
 }
 
 export function getModelDefaultValueVariableInitializer(model: DMMF.Model) {
-  return Object.fromEntries(
-    model.fields
-      .filter((field) => !field.isId)
-      .filter((field) => field.kind === 'scalar')
-      .filter((field) => {
-        return !model.fields.find((it) => {
-          return it.relationFromFields?.includes(field.name)
-        })
+  const fields = model.fields
+    .filter((field) => !field.isId)
+    .filter((field) => field.kind === 'scalar')
+    .filter((field) => {
+      return !model.fields.find((it) => {
+        return it.relationFromFields?.includes(field.name)
       })
-      .filter((field) => !field.hasDefaultValue)
-      .map((field) => [field.name, fakerForField(field)])
-  )
+    })
+    .filter((field) => !field.hasDefaultValue)
+  return Object.fromEntries([
+    ...fields
+      .filter((field) => !field.isList)
+      .map((field) => [field.name, fakerForField(field)]),
+    ...fields
+      .filter((field) => field.isList)
+      .map((field) => [
+        field.name,
+        `[${fakerForField(field)},${fakerForField(field)},${fakerForField(
+          field
+        )}]`,
+      ]),
+  ])
 }
 
 function getAttributesForFunctionName(model: DMMF.Model) {

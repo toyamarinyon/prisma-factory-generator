@@ -5,11 +5,19 @@ import {
 } from '../generator'
 import { Project, ts } from 'ts-morph'
 const datamodel = /* Prisma */ `
+
+datasource db {
+  ///sqlite doesn't support String[]
+  provider = "postgresql"
+  url="postgresql://test:test@localhost:5432/test"
+}
+
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  jsonProp    Json
-  accessToken AccessToken?
+  id                Int          @id @default(autoincrement())
+  email             String       @unique
+  stringArray       String[]       
+  jsonProp          Json
+  accessToken       AccessToken?
 
   @@map(name: "users")
 }
