@@ -5,13 +5,26 @@ import {
 } from '../generator'
 import { Project, ts } from 'ts-morph'
 const datamodel = /* Prisma */ `
+
+datasource db {
+  ///sqlite doesn't support String[]
+  provider = "postgresql"
+  url="postgresql://test:test@localhost:5432/test"
+}
+
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  jsonProp    Json
-  accessToken AccessToken?
+  id                Int          @id @default(autoincrement())
+  email             String       @unique
+  stringArray       String[]       
+  jsonProp          Json
+  status            UserStatus
+  accessToken       AccessToken?
 
   @@map(name: "users")
+}
+
+enum UserStatus {
+  active
 }
 
 model AccessToken {
@@ -33,7 +46,12 @@ test('generate model', async () => {
   const dmmf = await getDMMF({ datamodel })
   addPrismaImportDeclaration(sourceFile)
   dmmf.datamodel.models.forEach((model) => {
-    addModelFactoryDeclaration(sourceFile, model, dmmf.datamodel.models)
+    addModelFactoryDeclaration(
+      sourceFile,
+      model,
+      dmmf.datamodel.models,
+      dmmf.datamodel.enums
+    )
   })
 
   sourceFile.formatText({

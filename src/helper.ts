@@ -13,7 +13,7 @@ export function fakerForStringField(fieldName: string) {
   return 'faker.name.title()'
 }
 
-export function fakerForField(field: DMMF.Field) {
+export function fakerForField(field: DMMF.Field, enums: DMMF.DatamodelEnum[]) {
   const fieldType = field.type
   const fieldKind = field.kind
   if (fieldType === 'String') {
@@ -36,6 +36,15 @@ export function fakerForField(field: DMMF.Field) {
   }
   if (fieldType === 'Json') {
     return 'faker.datatype.json()'
+  }
+  if (fieldKind === 'enum') {
+    const enumName = fieldType
+    const enumValues = enums.find((it) => it.name === enumName)?.values
+    if (enumValues?.length) {
+      //if we have at least one enum value
+      const enumValuesAsString = enumValues.map((v) => `'${v.name}'`).join(', ')
+      return `faker.random.arrayElement([${enumValuesAsString}])`
+    }
   }
   throw new Error(`${fieldType} isn't supported. kind: ${fieldKind}`)
 }

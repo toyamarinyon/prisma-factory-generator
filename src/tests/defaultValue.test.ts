@@ -30,12 +30,14 @@ let dmmf: DMMF.Document
 let userModel: DMMF.Model
 let accessTokenModel: DMMF.Model
 let initializer: Record<string, any>
+let enums: DMMF.DatamodelEnum[]
 
 beforeAll(async () => {
   dmmf = await getDMMF({ datamodel })
   userModel = dmmf.datamodel.models[0]
   accessTokenModel = dmmf.datamodel.models[1]
-  initializer = getModelDefaultValueVariableInitializer(accessTokenModel)
+  enums = dmmf.datamodel.enums
+  initializer = getModelDefaultValueVariableInitializer(accessTokenModel, enums)
 })
 
 test('@id field is not generate', () => {
@@ -58,6 +60,6 @@ test('set @default field is not generate', () => {
 test('snapshot', () => {
   const project = new Project()
   const sourceFile = project.createSourceFile('tmp')
-  addModelAttributeForFunction(sourceFile, userModel)
+  addModelAttributeForFunction(sourceFile, userModel, enums)
   expect(sourceFile.getText()).toMatchSnapshot()
 })
