@@ -41,9 +41,10 @@ export function fakerForField(field: DMMF.Field, enums: DMMF.DatamodelEnum[]) {
     const enumName = fieldType
     const enumValues = enums.find((it) => it.name === enumName)?.values
     if (enumValues?.length) {
-      const randomIndex = Math.floor(Math.random() * enumValues.length)
-      const enumValue = enumValues[randomIndex]
-      return `'${enumValue.dbName || enumValue.name}'`
+      //if we have at least one enum value
+      return `[${enumValues
+        .map((v) => `'${v.dbName || v.name}'`)
+        .join(', ')}][Math.floor(Math.random() * ${enumValues.length})]`
     }
   }
   throw new Error(`${fieldType} isn't supported. kind: ${fieldKind}`)
