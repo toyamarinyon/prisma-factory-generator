@@ -34,7 +34,7 @@ export function inputsForAccessToken() {
 }
 
 type AccessTokenFactoryArgs = Omit<Prisma.AccessTokenCreateArgs, 'data'> & {
-  data: Pick<Prisma.AccessTokenCreateInput, 'user'> & Partial<Omit<Prisma.AccessTokenCreateInput, 'user'>>
+  data: Pick<Prisma.AccessTokenCreateInput, 'user' | 'v2User'> & Partial<Omit<Prisma.AccessTokenCreateInput, 'user' | 'v2User'>>
 }
 
 export async function createAccessToken(args: AccessTokenFactoryArgs) {
@@ -43,6 +43,28 @@ export async function createAccessToken(args: AccessTokenFactoryArgs) {
     ...args,
     data: {
       ...inputsForAccessToken(),
+      ...args?.data
+    },
+  })
+
+}
+
+export function inputsForV2User() {
+  return {
+    email: faker.internet.email(), jsonProp: faker.datatype.json(),
+  }
+}
+
+type V2UserFactoryArgs = Omit<Prisma.V2UserCreateArgs, 'data'> & {
+  data: Pick<Prisma.V2UserCreateInput, 'accessToken'> & Partial<Omit<Prisma.V2UserCreateInput, 'accessToken'>>
+}
+
+export async function createV2User(args?: V2UserFactoryArgs) {
+
+  return await prisma.v2_User.create({
+    ...args,
+    data: {
+      ...inputsForV2User(),
       ...args?.data
     },
   })

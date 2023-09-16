@@ -1,6 +1,6 @@
 import { DMMF } from '@prisma/client/runtime'
 import camelcase from 'camelcase'
-import { fakerForField } from './helper'
+import { fakerForField, lowerCase } from './helper'
 import { SourceFile } from 'ts-morph'
 import { args, factoryArgsTypeName } from './args'
 import { hasRequiredRelation } from './relation'
@@ -166,7 +166,7 @@ export function addModelFactoryDeclaration(
       },
     ],
     statements: `
-      return await prisma.${camelcase(modelName)}.create({
+      return await prisma.${lowerCase(modelName)}.create({
         ...args,
         data: {
           ...${getAttributesForFunctionName(model)}(),

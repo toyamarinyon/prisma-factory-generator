@@ -39,3 +39,7 @@ export function fakerForField(field: DMMF.Field) {
   }
   throw new Error(`${fieldType} isn't supported. kind: ${fieldKind}`)
 }
+
+export function lowerCase(name: string): string {
+  return name.substring(0, 1).toLowerCase() + name.substring(1)
+}

@@ -18,8 +18,19 @@ model AccessToken {
   id          Int       @id @default(autoincrement())
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @unique @map(name: "user_id")
+  v2User      V2_User   @relation(fields: [v2UserId], references: [id])
+  v2UserId    Int       @unique @map(name: "v2_user_id")
 
   @@map("access_tokens")
+}
+
+model V2_User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  jsonProp    Json
+  accessToken AccessToken?
+
+  @@map(name: "v2_users")
 }
 `
 
