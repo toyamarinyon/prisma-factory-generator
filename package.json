@@ -34,7 +34,8 @@
   "scripts": {
     "build": "swc src -d dist",
     "test": "jest",
-    "dev": "ts-node example/test-run.ts"
+    "dev": "ts-node example/test-run.ts",
+    "prepare": "yarn build"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
